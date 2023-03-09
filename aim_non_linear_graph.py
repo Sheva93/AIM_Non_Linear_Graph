@@ -91,10 +91,7 @@ def solve_matrix():
         i = np.random.randint(1,len(curr_prob_matrix)-1) #выбираем вершину для удаления
 
         for j in range(len(curr_prob_matrix[i])):
-
-            if curr_prob_matrix[i][j] <= 0.0: #пропускаем цикл, поскольку наличие нуля означает 
-                continue                      #отсутствие какого либо перехода
-
+            
             for k in range(len(curr_prob_matrix[i])): # K индексы по столбцу, J индексы по строке
                 if (k == i) or (j == i): #k - это строки, по столбцу i (i также является строкой. Мы удаляем элементы [i,i])
                     continue
@@ -108,8 +105,6 @@ def solve_matrix():
                     temp_ki_ij = curr_temp_matrix[k][i] + curr_temp_matrix[i][j] #сокращаем временную последовательность
 
                     if curr_prob_matrix[k][j] == 0.0: #если элемент равен нулю, то просто присваиваем ему новое значение
-                        #print(f"k={k} и j={j} если k-j = 0.0 \n")
-
                         curr_prob_matrix[k][j],curr_temp_matrix[k][j] = [ #в python не переносить переменные на след. строку
                             prob_ki_ij,temp_ki_ij                         #при присвоении им значения... !!!
                         ]
@@ -123,8 +118,6 @@ def solve_matrix():
                     #print("Прибавляет новые значения в список... \n")
                     curr_prob_matrix[k][j].append(curr_prob_matrix[k][i] * curr_prob_matrix[i][j])  
                     curr_temp_matrix[k][j].append(curr_temp_matrix[k][i] + curr_temp_matrix[i][j])
-
-                #x,y = define_coords(k,j,i) #определяем координаты
 
                 if k == j:
                     x,y = define_coords(k,j,i)

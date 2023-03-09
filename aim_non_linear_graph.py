@@ -115,7 +115,6 @@ def solve_matrix():
                         ]
 
                 elif isinstance(curr_prob_matrix[k][j], list): #если объект - список... 
-                    #print("Прибавляет новые значения в список... \n")
                     curr_prob_matrix[k][j].append(curr_prob_matrix[k][i] * curr_prob_matrix[i][j])  
                     curr_temp_matrix[k][j].append(curr_temp_matrix[k][i] + curr_temp_matrix[i][j])
 
@@ -124,12 +123,6 @@ def solve_matrix():
                     cycles_.append(x) #координаты петель
                 elif k != j and isinstance(curr_prob_matrix[k][j], list): 
                     par_edges.append(define_coords(k,j,i)) #координаты параллельных (сразу вызываем функцию)
-                    #print(f"Параллельные дуги {par_edges}\n")
-
-        #Удаляем сначала столбец...
-
-        #print("\n--------->")
-        #print(f"Is deleted the state {i}")
 
         for l in range(len(curr_prob_matrix)):
             curr_prob_matrix[l].pop(i)
@@ -139,7 +132,6 @@ def solve_matrix():
         curr_prob_matrix.pop(i)
         curr_temp_matrix.pop(i)
 
-        #print("До сюда дошло...")
 
         #Удаляем параллельные дуги...
         if len(par_edges) > 0:
@@ -152,8 +144,6 @@ def solve_matrix():
 
         #Проверяем о наличии петель... 
         check_for_cycles_() #удаляем все петли
-
-        #show_matrix() # показываем упрощенный вариант матрицы n степени.
 
         
 matrix_prob = [ #0   #1   #2    #3   #4   #5   #6   #7   #8   #9   #10   

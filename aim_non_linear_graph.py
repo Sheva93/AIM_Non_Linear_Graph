@@ -80,10 +80,89 @@ def check_for_cycles_():
         curr_temp_matrix[i][i] = 0    
 
 
-#...
-# ?????????
-#...
+def solve_matrix():
+    check_for_cycles_()
 
+    cycles_ = []
+    par_edges = []
+
+    while len(curr_prob_matrix) > 2:    
+
+        i = np.random.randint(1,len(curr_prob_matrix)-1) #выбираем вершину для удаления
+
+        for j in range(len(curr_prob_matrix[i])):
+
+            if curr_prob_matrix[i][j] <= 0.0: #пропускаем цикл, поскольку наличие нуля означает 
+                continue                      #отсутствие какого либо перехода
+
+            for k in range(len(curr_prob_matrix[i])): # K индексы по столбцу, J индексы по строке
+                if (k == i) or (j == i): #k - это строки, по столбцу i (i также является строкой. Мы удаляем элементы [i,i])
+                    continue
+
+                if (isinstance(curr_prob_matrix[k][j], float) 
+                    and curr_prob_matrix[k][i] > 0.0 
+                    and curr_prob_matrix[i][j] > 0.0): #Надо проверять, что перемножаемые значения больше 0.0
+                                                       #из-за этого вылетала ошибка
+
+                    prob_ki_ij = curr_prob_matrix[k][i] * curr_prob_matrix[i][j] #сокращаем последовательность вероятностей
+                    temp_ki_ij = curr_temp_matrix[k][i] + curr_temp_matrix[i][j] #сокращаем временную последовательность
+
+                    if curr_prob_matrix[k][j] == 0.0: #если элемент равен нулю, то просто присваиваем ему новое значение
+                        #print(f"k={k} и j={j} если k-j = 0.0 \n")
+
+                        curr_prob_matrix[k][j],curr_temp_matrix[k][j] = [ #в python не переносить переменные на след. строку
+                            prob_ki_ij,temp_ki_ij                         #при присвоении им значения... !!!
+                        ]
+                    elif curr_prob_matrix[k][j] > 0.0: #если элемент больше нуля, то создаем массив
+                        curr_prob_matrix[k][j],curr_temp_matrix[k][j] = [
+                            [curr_prob_matrix[k][j],prob_ki_ij],
+                            [curr_temp_matrix[k][j],temp_ki_ij]
+                        ]
+
+                elif isinstance(curr_prob_matrix[k][j], list): #если объект - список... 
+                    #print("Прибавляет новые значения в список... \n")
+                    curr_prob_matrix[k][j].append(curr_prob_matrix[k][i] * curr_prob_matrix[i][j])  
+                    curr_temp_matrix[k][j].append(curr_temp_matrix[k][i] + curr_temp_matrix[i][j])
+
+                #x,y = define_coords(k,j,i) #определяем координаты
+
+                if k == j:
+                    x,y = define_coords(k,j,i)
+                    cycles_.append(x) #координаты петель
+                elif k != j and isinstance(curr_prob_matrix[k][j], list): 
+                    par_edges.append(define_coords(k,j,i)) #координаты параллельных (сразу вызываем функцию)
+                    #print(f"Параллельные дуги {par_edges}\n")
+
+        #Удаляем сначала столбец...
+
+        #print("\n--------->")
+        #print(f"Is deleted the state {i}")
+
+        for l in range(len(curr_prob_matrix)):
+            curr_prob_matrix[l].pop(i)
+            curr_temp_matrix[l].pop(i)
+
+        #...затем строку
+        curr_prob_matrix.pop(i)
+        curr_temp_matrix.pop(i)
+
+        #print("До сюда дошло...")
+
+        #Удаляем параллельные дуги...
+        if len(par_edges) > 0:
+            for l in range(len(par_edges)):
+                new_p,new_t = del_parallel_edges_(par_edges[l][0],par_edges[l][1]) 
+                curr_prob_matrix[par_edges[l][0]][par_edges[l][1]] = new_p
+                curr_temp_matrix[par_edges[l][0]][par_edges[l][1]] = new_t
+
+        par_edges = []
+
+        #Проверяем о наличии петель... 
+        check_for_cycles_() #удаляем все петли
+
+        #show_matrix() # показываем упрощенный вариант матрицы n степени.
+
+        
 matrix_prob = [ #0   #1   #2    #3   #4   #5   #6   #7   #8   #9   #10   
                 [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], #0
                 [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], #1
@@ -112,4 +191,5 @@ temp_matrix = [ #0 #1 #2 #3 #4 #5 #6 #7 #8 #9 #10
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], #10
               ]
 
-
+curr_prob_matrix = matrix_prob
+curr_temp_matrix = temp_matrix
